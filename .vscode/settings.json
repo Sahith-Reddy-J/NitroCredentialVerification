@@ -1,0 +1,3 @@
+{
+  "python.analysis.extraPaths": ["./nitro-web/web/backend"]
+}

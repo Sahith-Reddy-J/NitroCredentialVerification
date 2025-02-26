@@ -1,0 +1,57 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f5f5f5;
+    margin: 2rem;
+}
+
+.container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 2rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #2c3e50;
+    color: white;
+}
+
+button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+button.detail {
+    background: #3498db;
+    color: white;
+}
+
+button.sign {
+    background: #e74c3c;
+    color: white;
+    margin-left: 8px;
+}
+
+button.sign[disabled] {
+    background: #4CAF50;
+    cursor: not-allowed;
+}
+
+tr[data-signed="true"] {
+    background-color: #fff9e6;
+}

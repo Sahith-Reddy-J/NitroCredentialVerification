@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Skill Wallet</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Skill Credential Wallet</h1>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Earner Name</th>
+                    <th>Credential Type</th>
+                    <th>Skill Type</th>
+                    <th>Skill Level</th>
+                    <th>Issue Time</th>
+                    <th>Issuer</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-signed="false">
+                    <td>Tina Xu</td>
+                    <td>Verifiable Credential</td>
+                    <td>C#</td>
+                    <td>5</td>
+                    <td>02/05/2025</td>
+                    <td>Self</td>
+                    <td>
+                        <button class="detail">DETAIL</button>
+                        <button class="sign" onclick="signSkill('C#')">SIGN</button>
+                    </td>
+                </tr>
+                <!-- Repeat for other skills -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        async function signSkill(skill) {
+            const row = event.target.closest('tr');
+            if(row.dataset.signed === 'true') return;
+            
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = 'Signing...';
+            
+            try {
+                const response = await fetch('/sign-kill', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        student_id: 'Tina Xu',
+                        skill: skill
+                    })
+                });
+                
+                if(response.ok) {
+                    row.style.backgroundColor = '#fff9e6';
+                    btn.textContent = 'SIGNED';
+                    btn.style.backgroundColor = '#4CAF50';
+                    row.dataset.signed = 'true';
+                }
+            } catch (error) {
+                btn.textContent = 'Retry';
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
