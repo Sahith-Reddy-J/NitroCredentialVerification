@@ -1,14 +1,20 @@
 #!/bin/bash
 
-# Install system dependencies
-sudo yum update -y
-sudo amazon-linux-extras install nginx1 -y
-sudo yum install -y python3 git
+# Clear yum locks
+sudo rm -f /var/run/yum.pid
+
+# Install dependencies
+for i in {1..5}; do
+    sudo yum install -y python3 git nginx && break || sleep 15
+done
 
 # Configure Python environment
 cd web/backend
 python3 -m venv venv
 source venv/bin/activate
+
+# Upgrade pip and install requirements
+python3 -m pip install --upgrade pip
 pip install -r requirements.txt
 
 # Configure systemd
@@ -27,12 +33,7 @@ Restart=always
 WantedBy=multi-user.target
 EOF
 
-# Start service
-sudo systemctl daemon-reload
-sudo systemctl start nitro-web
-sudo systemctl enable nitro-web
-
-# Configure NGINX
+# Configure Nginx
 sudo tee /etc/nginx/conf.d/nitro-web.conf <<EOF
 server {
     listen 80;
@@ -46,8 +47,15 @@ server {
 
     location /static {
         alias $(pwd)/../frontend;
+        autoindex off;
     }
 }
 EOF
 
+# Set permissions
+sudo chown -R ec2-user:ec2-user $(pwd)/../../
+
+# Restart services
+sudo systemctl daemon-reload
+sudo systemctl enable --now nitro-web
 sudo systemctl restart nginx
