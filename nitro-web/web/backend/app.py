@@ -1,17 +1,14 @@
 from flask import Flask, request, jsonify, send_from_directory
 from threading import Semaphore
 import logging
+import traceback
 
 app = Flask(__name__, static_folder='../frontend')
-sign_semaphore = Semaphore(10)  # Rate limiting
+sign_semaphore = Semaphore(10)
 
 @app.route('/')
 def serve_ui():
     return send_from_directory('../frontend', 'index.html')
-
-@app.route('/home')
-def serve_ui2():
-    return "Hello, World!"
 
 @app.route('/sign-skill', methods=['POST'])
 def handle_sign_request():
@@ -20,21 +17,25 @@ def handle_sign_request():
         
     try:
         data = request.get_json()
+        print(f"Received data from frontend: {data}")
+        # Validate input
         required = {'student_id', 'skill'}
-        
         if not all(k in data for k in required):
-            return jsonify({"error": "Missing fields"}), 400
+            return jsonify({"error": "Missing student_id or skill"}), 400
             
-        if len(data['skill']) > 100 or len(data['student_id']) > 50:
-            return jsonify({"error": "Invalid input"}), 400
-            
+        # Sanitize input
+        sanitized_data = {
+            "student_id": str(data['student_id']).strip()[:50],
+            "skill": str(data['skill']).strip()[:100]
+        }
+        print(f"Sanitized data and sending to sign: {sanitized_data}")
         from client import sign_skill
-        response = sign_skill(data)
+        response = sign_skill(sanitized_data)
         return jsonify(response)
         
     except Exception as e:
-        logging.error(f"Signing error: {str(e)}")
-        return jsonify({"error": "Processing failed"}), 500
+        logging.error(f"Signing Error: {traceback.format_exc()}")
+        return jsonify({"error": "Internal processing error"}), 500
         
     finally:
         sign_semaphore.release()

@@ -40,32 +40,52 @@
 
     <script>
         async function signSkill(skill) {
-            const row = event.target.closest('tr');
+            const btn = event.target;
+            const row = btn.closest('tr');
+            
             if(row.dataset.signed === 'true') return;
             
-            const btn = event.target;
             btn.disabled = true;
             btn.textContent = 'Signing...';
             
             try {
                 const response = await fetch('/sign-skill', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
                     body: JSON.stringify({
                         student_id: 'Tina Xu',
                         skill: skill
                     })
                 });
                 
-                if(response.ok) {
-                    row.style.backgroundColor = '#fff9e6';
-                    btn.textContent = 'SIGNED';
-                    btn.style.backgroundColor = '#4CAF50';
-                    row.dataset.signed = 'true';
+                if(!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Signing failed');
                 }
+                
+                const result = await response.json();
+                
+                if(result.error) {
+                    throw new Error(result.error);
+                }
+                
+                row.style.backgroundColor = '#fff9e6';
+                btn.textContent = 'SIGNED';
+                btn.style.backgroundColor = '#4CAF50';
+                row.dataset.signed = 'true';
+                
             } catch (error) {
-                btn.textContent = 'Retry';
-                btn.disabled = false;
+                console.error('Signing error:', error);
+                btn.textContent = 'Error! Retry';
+                btn.style.backgroundColor = '#ff0000';
+                setTimeout(() => {
+                    btn.textContent = 'SIGN';
+                    btn.style.backgroundColor = '#e74c3c';
+                    btn.disabled = false;
+                }, 2000);
             }
         }
     </script>
