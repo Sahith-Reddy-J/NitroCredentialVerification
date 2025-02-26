@@ -37,9 +37,7 @@ sudo docker build -t skill-signer .
 # Build EIF with explicit parameters
 sudo nitro-cli build-enclave \
   --docker-uri skill-signer:latest \
-  --output-file enclave.eif \
-  --memory 512 \
-  --cpu-count 2
+  --output-file enclave.eif 
 
 # Terminate existing enclaves
 sudo nitro-cli terminate-enclave --all || true
