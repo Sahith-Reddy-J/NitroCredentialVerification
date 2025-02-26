@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Skill Wallet</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <div class="container">
@@ -48,7 +48,7 @@
             btn.textContent = 'Signing...';
             
             try {
-                const response = await fetch('/sign-kill', {
+                const response = await fetch('/sign-skill', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
