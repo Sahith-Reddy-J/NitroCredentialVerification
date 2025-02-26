@@ -3,13 +3,16 @@
 # Clear yum locks
 sudo rm -f /var/run/yum.pid
 
+# Get absolute project root path
+PROJECT_ROOT="/home/ec2-user/NitroCredentialVerification/nitro-web"
+
 # Install dependencies
 for i in {1..5}; do
     sudo yum install -y python3 git nginx && break || sleep 15
 done
 
 # Configure Python environment
-cd web/backend
+cd "$PROJECT_ROOT/web/backend"
 python3 -m venv venv
 source venv/bin/activate
 
@@ -25,8 +28,8 @@ After=network.target
 
 [Service]
 User=ec2-user
-WorkingDirectory=$(pwd)
-ExecStart=$(pwd)/venv/bin/gunicorn --bind 0.0.0.0:5000 app:app
+WorkingDirectory=$PROJECT_ROOT/web/backend
+ExecStart=$PROJECT_ROOT/web/backend/venv/bin/gunicorn --bind 0.0.0.0:5000 app:app
 Restart=always
 
 [Install]
@@ -46,14 +49,19 @@ server {
     }
 
     location /static {
-        alias $(pwd)/../frontend;
+        alias $PROJECT_ROOT/web/frontend;
         autoindex off;
+        expires 1M;
+        access_log off;
+        add_header Cache-Control "public";
     }
 }
 EOF
 
 # Set permissions
-sudo chown -R ec2-user:ec2-user $(pwd)/../../
+sudo chown -R ec2-user:ec2-user "$PROJECT_ROOT"
+sudo find "$PROJECT_ROOT/web/frontend" -type d -exec chmod 755 {} \;
+sudo find "$PROJECT_ROOT/web/frontend" -type f -exec chmod 644 {} \;
 
 # Restart services
 sudo systemctl daemon-reload
