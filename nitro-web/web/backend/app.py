@@ -10,7 +10,7 @@ def serve_ui():
     return send_from_directory('../frontend', 'index.html')
 
 @app.route('/home')
-def serve_ui():
+def serve_ui2():
     return "Hello, World!"
 
 @app.route('/sign-skill', methods=['POST'])
